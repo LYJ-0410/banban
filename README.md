@@ -4,7 +4,7 @@
 
 ### 年轻人兴趣社交平台
 
-**简洁易懂的全栈社交应用，适合学习和理解前后端分离项目开发**
+**⚠️ 当前为基础版本（单体架构），正在进行微服务改造和 AI 集成升级**
 
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2-6DB33F?style=flat-square&logo=spring)](https://spring.io/projects/spring-boot)
 [![Vue](https://img.shields.io/badge/Vue-3.4-4FC08D?style=flat-square&logo=vue.js)](https://vuejs.org/)
@@ -16,11 +16,27 @@
 
 ---
 
+## 📢 项目状态
+
+**当前版本：v1.0 基础版（单体架构）**
+
+本项目已完成基础社交功能的开发，采用 Spring Boot 单体架构。后续将进行以下升级：
+
+- 🔄 **微服务改造** - 拆分为多个独立服务
+- 🤖 **AI 集成** - 接入 Dify 和 MCP 协议
+- 📊 **服务治理** - 使用 Nacos 进行服务注册与配置管理
+
+完整开发计划见 [项目路线图](#-开发路线图)
+
+---
+
 ## 📖 项目简介
 
 伴伴是一个基于 **Spring Boot 3 + Vue 3** 的社交平台，采用前后端分离架构，实现了用户系统、动态发布、点赞评论、关注系统等核心社交功能。
 
 项目设计简洁易懂，代码结构清晰，适合作为全栈开发学习和面试作品展示。
+
+> **📌 注意：** 当前为基础版本（单体架构），后续将进行微服务改造和 AI 集成升级，打造完整的企业级社交平台。
 
 ### ✨ 核心功能
 
@@ -54,6 +70,19 @@
 | Pinia | 2.1.7 | 状态管理 |
 | Vue Router | 4.2.5 | 路由管理 |
 | Axios | 1.6.2 | HTTP 客户端 |
+
+### 后续升级技术栈（计划中）
+| 技术 | 说明 |
+|------|------|
+| Spring Cloud | 微服务框架 |
+| Nacos | 服务注册与配置中心 |
+| Spring Cloud Gateway | API 网关 |
+| OpenFeign | 服务间调用 |
+| RabbitMQ | 消息队列 |
+| Dify | AI 应用开发平台 |
+| MCP | Model Context Protocol |
+| Docker | 容器化部署 |
+| Kubernetes | 容器编排 |
 
 ---
 
@@ -253,26 +282,78 @@ UNIQUE KEY `uk_post_user` (`post_id`, `user_id`)
 
 ---
 
-## 📝 开发计划
+## 🗺️ 开发路线图
 
-### Phase 1: 基础功能 ✅
+### Phase 1: 基础版本 ✅ (已完成)
 - [x] 用户注册登录
 - [x] 发布动态
 - [x] 动态列表
 - [x] 点赞评论
 - [x] 关注系统
+- [x] 前后端分离架构
 
-### Phase 2: 增强功能 🚧
-- [ ] 图片上传
-- [ ] 消息通知
+### Phase 2: 功能完善 🚧 (进行中)
+- [ ] 图片上传与存储
+- [ ] 消息通知系统
 - [ ] 搜索功能
 - [ ] 个人主页优化
+- [ ] 响应式移动端适配
 
-### Phase 3: AI 集成 🤖
-- [ ] 集成 Dify AI 助手
-- [ ] 智能推荐
-- [ ] 内容审核
-- [ ] 智能回复
+### Phase 3: 微服务改造 🔄 (计划中)
+- [ ] 拆分为多个微服务
+  - 用户服务 (User Service)
+  - 动态服务 (Post Service)
+  - 互动服务 (Interaction Service)
+  - 消息服务 (Message Service)
+- [ ] 引入 Spring Cloud 组件
+- [ ] API 网关 (Gateway)
+- [ ] 服务注册与发现 (Nacos)
+- [ ] 配置中心 (Nacos)
+- [ ] 分布式事务处理
+- [ ] 服务间通信 (OpenFeign/RabbitMQ)
+
+### Phase 4: AI 智能集成 🤖 (计划中)
+- [ ] 集成 Dify AI 平台
+- [ ] MCP (Model Context Protocol) 协议接入
+- [ ] 智能内容推荐
+- [ ] AI 内容审核
+- [ ] 智能回复助手
+- [ ] 用户行为分析
+
+### Phase 5: 运维与监控 📊 (计划中)
+- [ ] Docker 容器化部署
+- [ ] Kubernetes 编排
+- [ ] 链路追踪 (SkyWalking/Zipkin)
+- [ ] 日志聚合 (ELK Stack)
+- [ ] 性能监控 (Prometheus + Grafana)
+- [ ] CI/CD 自动化部署
+
+---
+
+## 🎯 技术架构演进
+
+### 当前架构（v1.0）
+```
+前端 (Vue 3) → Nginx → Spring Boot 单体应用 → MySQL + Redis
+```
+
+### 目标架构（v2.0）
+```
+前端 (Vue 3) 
+  ↓
+API Gateway (Spring Cloud Gateway)
+  ↓
+┌─────────────┬─────────────┬─────────────┬─────────────┐
+│ User Service│ Post Service│ Interaction │ AI Service  │
+│             │             │   Service   │  (Dify+MCP) │
+└─────────────┴─────────────┴─────────────┴─────────────┘
+  ↓             ↓             ↓             ↓
+MySQL         MySQL         MySQL        MongoDB
+  ↓             ↓             ↓             ↓
+         Nacos (服务注册/配置中心)
+         ↓
+    Redis Cluster
+```
 
 ---
 
@@ -317,6 +398,21 @@ A: 已配置 `CorsConfig.java`，检查前端代理配置
 
 ---
 
+## 🤝 贡献
+
+欢迎提交 Issue 和 Pull Request！
+
+如果你对这个项目感兴趣，想要参与后续的微服务改造或 AI 集成，请联系作者。
+
+---
+
+## 📧 联系方式
+
+- GitHub: [@LYJ-0410](https://github.com/LYJ-0410)
+- Email: [your-email@example.com]
+
+---
+
 ## 📄 许可证
 
 MIT License
@@ -325,8 +421,16 @@ MIT License
 
 <div align="center">
 
-**伴伴 BanBan** - 简洁易懂的社交应用
+### 🌟 伴伴 BanBan
+
+**当前版本：v1.0 基础版** | **状态：持续开发中**
+
+简洁易懂的社交应用 → 企业级微服务平台
 
 Made with ❤️ for learning
+
+---
+
+**⭐ 如果这个项目对你有帮助，请给一个 Star 支持！**
 
 </div>
