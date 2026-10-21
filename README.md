@@ -398,21 +398,6 @@ A: 已配置 `CorsConfig.java`，检查前端代理配置
 
 ---
 
-## 🤝 贡献
-
-欢迎提交 Issue 和 Pull Request！
-
-如果你对这个项目感兴趣，想要参与后续的微服务改造或 AI 集成，请联系作者。
-
----
-
-## 📧 联系方式
-
-- GitHub: [@LYJ-0410](https://github.com/LYJ-0410)
-- Email: [your-email@example.com]
-
----
-
 ## 📄 许可证
 
 MIT License
