@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 public class CommentService {
@@ -22,7 +24,7 @@ public class CommentService {
      * 发表评论
      */
     @Transactional
-    public Long addComment(Long postId, Long userId, String content, Long replyUserId) {
+    public Long addComment(Long postId, Long userId, String content, Long replyUserId, Integer anonymous) {
         // 检查动态
         Post post = postMapper.selectById(postId);
         if (post == null) {
@@ -36,6 +38,8 @@ public class CommentService {
         comment.setContent(content);
         comment.setReplyUserId(replyUserId);
         comment.setLikeCount(0);
+        comment.setAnonymous(anonymous != null ? anonymous : 0);
+        comment.setCreateTime(LocalDateTime.now());
         commentMapper.insert(comment);
         
         // 更新动态评论数
@@ -50,11 +54,7 @@ public class CommentService {
      */
     public Page<Comment> getCommentsByPostId(Long postId, int page, int size) {
         Page<Comment> pageParam = new Page<>(page, size);
-        return commentMapper.selectPage(pageParam,
-            new LambdaQueryWrapper<Comment>()
-                .eq(Comment::getPostId, postId)
-                .orderByDesc(Comment::getCreateTime)
-        );
+        return commentMapper.selectCommentPage(pageParam, postId);
     }
     
     /**

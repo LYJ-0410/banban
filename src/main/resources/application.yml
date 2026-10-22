@@ -55,7 +55,7 @@ jwt:
 
 # 文件存储配置
 file:
-  upload-path: ./uploads
+  upload-path: D:/SJ/zhibanstar/uploads
   access-path: /uploads/
 
 # 日志配置

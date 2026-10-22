@@ -12,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -37,8 +39,10 @@ public class UserService {
         user.setUsername(request.getUsername());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setNickname(request.getNickname() != null ? request.getNickname() : request.getUsername());
-        user.setAvatar("/uploads/avatar/default.png");
+        user.setAvatar("/uploads/avatar/default.svg");
         user.setStatus(1);
+        user.setCreateTime(LocalDateTime.now());
+        user.setUpdateTime(LocalDateTime.now());
         userMapper.insert(user);
         
         return user.getId();
@@ -90,6 +94,7 @@ public class UserService {
      * 更新用户信息
      */
     public void updateUser(User user) {
+        user.setUpdateTime(LocalDateTime.now());
         userMapper.updateById(user);
     }
 }

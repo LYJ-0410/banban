@@ -12,8 +12,23 @@
       <!-- 个人信息 -->
       <div class="card">
         <div class="profile-header">
-          <img :src="userStore.userInfo?.avatar || '/uploads/avatar/default.png'" 
-               class="avatar avatar-large" />
+          <div style="position: relative; display: inline-block;">
+            <img :src="userStore.userInfo?.avatar || '/avatar/default.svg'" 
+                 class="avatar avatar-large" />
+            <el-upload
+              action="/api/upload/image"
+              :headers="uploadHeaders"
+              :show-file-list="false"
+              :on-success="handleAvatarSuccess"
+              :before-upload="beforeAvatarUpload"
+              accept="image/*"
+              style="position: absolute; bottom: 0; right: 0;"
+            >
+              <el-button size="small" type="primary" circle>
+                <el-icon><Camera /></el-icon>
+              </el-button>
+            </el-upload>
+          </div>
           <div class="nickname">{{ userStore.userInfo?.nickname }}</div>
           <div class="bio">{{ userStore.userInfo?.bio || '这个人很懒，什么都没写~' }}</div>
         </div>
@@ -41,6 +56,7 @@
           v-for="post in myPosts" 
           :key="post.id" 
           :post="post"
+          @delete="handleDeletePost"
         />
         <el-empty v-if="myPosts.length === 0" description="还没有发布动态" />
       </div>
@@ -73,7 +89,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { useUserStore } from '../store/user'
 import { updateUser } from '../api/auth'
@@ -95,7 +111,49 @@ const editForm = reactive({
   bio: ''
 })
 
+// 上传请求头（带 token）
+const uploadHeaders = computed(() => {
+  const token = localStorage.getItem('token')
+  return {
+    Authorization: token ? `Bearer ${token}` : ''
+  }
+})
+
+// 头像上传前验证
+const beforeAvatarUpload = (file) => {
+  const isImage = file.type.startsWith('image/')
+  const isLt2M = file.size / 1024 / 1024 < 2
+
+  if (!isImage) {
+    ElMessage.error('只能上传图片文件')
+    return false
+  }
+  if (!isLt2M) {
+    ElMessage.error('图片大小不能超过 2MB')
+    return false
+  }
+  return true
+}
+
+// 头像上传成功回调
+const handleAvatarSuccess = async (response) => {
+  if (response.code === 200) {
+    const avatarUrl = response.data
+    // 更新用户头像
+    await updateUser({ avatar: avatarUrl })
+    await userStore.refreshUserInfo()
+    ElMessage.success('头像更新成功')
+  } else {
+    ElMessage.error(response.message || '上传失败')
+  }
+}
+
 const loadData = async () => {
+  if (!userStore.userId) {
+    ElMessage.error('用户信息加载失败，请重新登录')
+    return
+  }
+  
   try {
     // 加载我的动态
     const postRes = await getPostList(1, 20)
@@ -114,6 +172,7 @@ const loadData = async () => {
     editForm.bio = userStore.userInfo?.bio || ''
   } catch (e) {
     console.error(e)
+    ElMessage.error('加载数据失败')
   }
 }
 
@@ -125,6 +184,11 @@ const saveProfile = async () => {
   await userStore.refreshUserInfo()
   ElMessage.success('保存成功')
   showEditDialog.value = false
+}
+
+const handleDeletePost = (postId) => {
+  myPosts.value = myPosts.value.filter(p => p.id !== postId)
+  stats.postCount = myPosts.value.length
 }
 
 onMounted(loadData)

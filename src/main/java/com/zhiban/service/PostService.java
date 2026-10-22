@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -38,6 +39,8 @@ public class PostService {
         post.setLikeCount(0);
         post.setCommentCount(0);
         post.setStatus(1);
+        post.setCreateTime(LocalDateTime.now());
+        post.setUpdateTime(LocalDateTime.now());
         postMapper.insert(post);
         
         return post.getId();
@@ -96,6 +99,7 @@ public class PostService {
             PostLike like = new PostLike();
             like.setPostId(postId);
             like.setUserId(userId);
+            like.setCreateTime(LocalDateTime.now());
             postLikeMapper.insert(like);
             post.setLikeCount(post.getLikeCount() + 1);
         }

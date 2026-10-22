@@ -12,7 +12,7 @@
       <!-- 用户信息 -->
       <div class="card" v-if="user">
         <div class="profile-header">
-          <img :src="user.avatar || '/uploads/avatar/default.png'" 
+          <img :src="user.avatar || '/avatar/default.svg'" 
                class="avatar avatar-large" />
           <div class="nickname">{{ user.nickname }}</div>
           <div class="bio">{{ user.bio || '这个人很懒，什么都没写~' }}</div>

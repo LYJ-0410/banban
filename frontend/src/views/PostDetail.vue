@@ -13,7 +13,7 @@
       <!-- 动态内容 -->
       <div class="card" v-if="post">
         <div class="post-header">
-          <img :src="post.avatar || '/uploads/avatar/default.png'" class="avatar" />
+          <img :src="post.avatar || '/avatar/default.svg'" class="avatar" />
           <div class="user-info">
             <div class="nickname">{{ post.nickname }}</div>
             <div class="time">{{ post.createTime }}</div>
@@ -23,7 +23,15 @@
         <div class="post-content" style="font-size: 16px;">{{ post.content }}</div>
         
         <div class="post-images" v-if="imageList.length > 0">
-          <img v-for="(img, i) in imageList" :key="i" :src="img" />
+          <el-image 
+            v-for="(img, i) in imageList" 
+            :key="i" 
+            :src="img" 
+            :preview-src-list="imageList"
+            :initial-index="i"
+            fit="contain"
+            style="width: 100%; height: auto;"
+          />
         </div>
         
         <div class="post-actions">
@@ -50,26 +58,29 @@
             :rows="2"
             placeholder="写下你的评论..."
           />
-          <el-button 
-            type="primary" 
-            style="margin-top: 8px;"
-            @click="submitComment"
-            :disabled="!commentContent.trim()"
-          >
-            发表评论
-          </el-button>
+          <div style="display: flex; align-items: center; gap: 12px; margin-top: 8px;">
+            <el-checkbox v-model="commentAnonymous">匿名评论</el-checkbox>
+            <el-button 
+              type="primary" 
+              @click="submitComment"
+              :disabled="!commentContent.trim()"
+            >
+              发表评论
+            </el-button>
+          </div>
         </div>
         
         <!-- 评论列表 -->
         <div v-for="comment in comments" :key="comment.id" 
              style="padding: 12px 0; border-bottom: 1px solid #f0f0f0;">
           <div style="display: flex; gap: 8px;">
+            <img :src="comment.avatar || '/avatar/default.svg'" class="avatar" style="width: 32px; height: 32px;" />
             <div style="flex: 1;">
               <div style="font-weight: 600; font-size: 14px;">
                 {{ comment.nickname || '匿名用户' }}
               </div>
               <div style="color: #333; margin: 4px 0;">{{ comment.content }}</div>
-              <div style="color: #999; font-size: 12px;">{{ comment.createTime }}</div>
+              <div style="color: #999; font-size: 12px;">{{ formatTime(comment.createTime) }}</div>
             </div>
           </div>
         </div>
@@ -94,6 +105,7 @@ const post = ref(null)
 const comments = ref([])
 const loading = ref(false)
 const commentContent = ref('')
+const commentAnonymous = ref(false)
 
 const imageList = computed(() => {
   try {
@@ -102,6 +114,20 @@ const imageList = computed(() => {
     return []
   }
 })
+
+const formatTime = (time) => {
+  if (!time) return ''
+  const date = new Date(time)
+  const now = new Date()
+  const diff = (now - date) / 1000
+  
+  if (diff < 60) return '刚刚'
+  if (diff < 3600) return `${Math.floor(diff / 60)}分钟前`
+  if (diff < 86400) return `${Math.floor(diff / 3600)}小时前`
+  if (diff < 86400 * 7) return `${Math.floor(diff / 86400)}天前`
+  
+  return `${date.getMonth() + 1}月${date.getDate()}日`
+}
 
 const loadData = async () => {
   loading.value = true
@@ -127,10 +153,12 @@ const submitComment = async () => {
   if (!commentContent.value.trim()) return
   await addComment({
     postId: post.value.id,
-    content: commentContent.value
+    content: commentContent.value,
+    anonymous: commentAnonymous.value ? 1 : 0
   })
   ElMessage.success('评论成功')
   commentContent.value = ''
+  commentAnonymous.value = false
   loadData()
 }
 

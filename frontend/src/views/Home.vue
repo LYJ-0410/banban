@@ -16,7 +16,7 @@
       <!-- 发布入口 -->
       <div class="card" style="display: flex; align-items: center; gap: 12px;" 
            v-if="userStore.isLoggedIn">
-        <img :src="userStore.userInfo?.avatar || '/uploads/avatar/default.png'" 
+        <img :src="userStore.userInfo?.avatar || '/avatar/default.svg'" 
              class="avatar" />
         <el-input 
           placeholder="分享你的想法..." 
@@ -33,6 +33,7 @@
           :key="post.id" 
           :post="post"
           @refresh="loadPosts"
+          @delete="handleDelete"
         />
         
         <el-empty v-if="!loading && posts.length === 0" description="暂无动态" />
@@ -85,6 +86,10 @@ const loadMore = async () => {
   } finally {
     loadingMore.value = false
   }
+}
+
+const handleDelete = (postId) => {
+  posts.value = posts.value.filter(p => p.id !== postId)
 }
 
 const handleLogout = () => {

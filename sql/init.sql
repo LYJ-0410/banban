@@ -50,6 +50,7 @@ CREATE TABLE IF NOT EXISTS `comment` (
   `reply_user_id` BIGINT DEFAULT NULL COMMENT '被回复用户ID',
   `content` VARCHAR(500) NOT NULL COMMENT '评论内容',
   `like_count` INT NOT NULL DEFAULT 0 COMMENT '点赞数',
+  `anonymous` TINYINT NOT NULL DEFAULT 0 COMMENT '是否匿名：0-否，1-是',
   `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `deleted` TINYINT NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
@@ -98,10 +99,10 @@ CREATE TABLE IF NOT EXISTS `notification` (
 -- ========================================
 
 -- 测试用户（密码是 123456 的 BCrypt 加密）
-INSERT INTO `user` (`username`, `password`, `nickname`, `avatar`, `gender`, `bio`) VALUES
-('admin', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iAt6Z5EO', '管理员', '/uploads/avatar/default.png', 1, '系统管理员'),
-('zhangsan', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iAt6Z5EO', '张三', '/uploads/avatar/default.png', 1, '热爱生活的张三'),
-('lisi', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iAt6Z5EO', '李四', '/uploads/avatar/default.png', 2, '喜欢旅行的李四');
+INSERT INTO `user` (`username`, `password`, `nickname`, `avatar`, `gender`, `bio`, `create_time`, `update_time`) VALUES
+('admin', '$2a$10$qRr7PaJdeyD0oqMo9bHpGuAaAwxexYAHzvtEUPXxEcKii.4qAGN6i', '管理员', '/uploads/avatar/default.png', 1, '系统管理员', NOW(), NOW()),
+('zhangsan', '$2a$10$qRr7PaJdeyD0oqMo9bHpGuAaAwxexYAHzvtEUPXxEcKii.4qAGN6i', '张三', '/uploads/avatar/default.png', 1, '热爱生活的张三', NOW(), NOW()),
+('lisi', '$2a$10$qRr7PaJdeyD0oqMo9bHpGuAaAwxexYAHzvtEUPXxEcKii.4qAGN6i', '李四', '/uploads/avatar/default.png', 2, '喜欢旅行的李四', NOW(), NOW());
 
 -- 测试动态
 INSERT INTO `post` (`user_id`, `content`, `images`, `like_count`, `comment_count`) VALUES

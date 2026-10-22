@@ -38,7 +38,12 @@ export const useUserStore = defineStore('user', {
     async refreshUserInfo() {
       try {
         const res = await getCurrentUser()
-        this.userInfo = res.data
+        this.userInfo = {
+          userId: res.data.id,
+          username: res.data.username,
+          nickname: res.data.nickname,
+          avatar: res.data.avatar
+        }
         localStorage.setItem('user', JSON.stringify(this.userInfo))
       } catch (e) {
         console.error('刷新用户信息失败', e)

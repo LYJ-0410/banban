@@ -2,13 +2,13 @@ package com.zhiban.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.zhiban.common.Result;
+import com.zhiban.dto.CommentRequest;
 import com.zhiban.entity.Comment;
 import com.zhiban.service.CommentService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/comment")
@@ -17,25 +17,20 @@ public class CommentController {
     
     private final CommentService commentService;
     
-    /**
-     * 发表评论
-     */
     @PostMapping
     public Result<Long> addComment(Authentication authentication, 
-                                    @RequestBody Map<String, Object> params) {
+                                    @Valid @RequestBody CommentRequest request) {
         Long userId = (Long) authentication.getPrincipal();
-        Long postId = Long.valueOf(params.get("postId").toString());
-        String content = (String) params.get("content");
-        Long replyUserId = params.get("replyUserId") != null ? 
-            Long.valueOf(params.get("replyUserId").toString()) : null;
-        
-        Long commentId = commentService.addComment(postId, userId, content, replyUserId);
+        Long commentId = commentService.addComment(
+            request.getPostId(), 
+            userId, 
+            request.getContent(), 
+            request.getReplyUserId(), 
+            request.getAnonymous()
+        );
         return Result.success(commentId);
     }
     
-    /**
-     * 查询评论列表
-     */
     @GetMapping("/post/{postId}")
     public Result<Page<Comment>> getComments(@PathVariable Long postId,
                                               @RequestParam(defaultValue = "1") int page,
@@ -44,9 +39,6 @@ public class CommentController {
         return Result.success(result);
     }
     
-    /**
-     * 删除评论
-     */
     @DeleteMapping("/{commentId}")
     public Result<?> deleteComment(Authentication authentication, 
                                     @PathVariable Long commentId) {

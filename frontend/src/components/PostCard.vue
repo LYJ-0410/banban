@@ -2,7 +2,7 @@
   <div class="post-card">
     <!-- 头部：用户信息 -->
     <div class="post-header">
-      <img :src="post.avatar || '/uploads/avatar/default.png'" class="avatar" 
+      <img :src="post.avatar || '/avatar/default.svg'" class="avatar" 
            @click="$router.push(`/user/${post.userId}`)" />
       <div class="user-info">
         <div class="nickname" @click="$router.push(`/user/${post.userId}`)">
@@ -10,6 +10,16 @@
         </div>
         <div class="time">{{ formatTime(post.createTime) }}</div>
       </div>
+      <!-- 删除按钮（仅自己的帖子显示） -->
+      <el-button 
+        v-if="isOwner" 
+        type="danger" 
+        size="small"
+        text
+        @click="handleDelete"
+      >
+        <el-icon><Delete /></el-icon>
+      </el-button>
     </div>
     
     <!-- 内容 -->
@@ -19,7 +29,15 @@
     
     <!-- 图片 -->
     <div class="post-images" v-if="imageList.length > 0">
-      <img v-for="(img, index) in imageList" :key="index" :src="img" />
+      <el-image 
+        v-for="(img, index) in imageList" 
+        :key="index" 
+        :src="img" 
+        :preview-src-list="imageList"
+        :initial-index="index"
+        fit="contain"
+        style="width: 100%; height: auto;"
+      />
     </div>
     
     <!-- 操作栏 -->
@@ -44,14 +62,21 @@
 
 <script setup>
 import { computed } from 'vue'
-import { ElMessage } from 'element-plus'
-import { toggleLike } from '../api/post'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { toggleLike, deletePost } from '../api/post'
+import { useUserStore } from '../store/user'
 
 const props = defineProps({
   post: { type: Object, required: true }
 })
 
-const emit = defineEmits(['refresh'])
+const emit = defineEmits(['refresh', 'delete'])
+
+const userStore = useUserStore()
+
+const isOwner = computed(() => {
+  return userStore.userId === props.post.userId
+})
 
 const imageList = computed(() => {
   try {
@@ -83,6 +108,23 @@ const handleLike = async () => {
     // 未登录时跳转到登录页
     if (e.response?.status === 401) {
       ElMessage.warning('请先登录')
+    }
+  }
+}
+
+const handleDelete = async () => {
+  try {
+    await ElMessageBox.confirm('确定要删除这条动态吗？', '提示', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    })
+    await deletePost(props.post.id)
+    ElMessage.success('删除成功')
+    emit('delete', props.post.id)
+  } catch (e) {
+    if (e !== 'cancel') {
+      ElMessage.error('删除失败')
     }
   }
 }
